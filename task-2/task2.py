@@ -1,30 +1,19 @@
 import os
-from dotenv import load_dotenv
+from utils.env_loader import load_env_vars
+from utils.summarizer import summarizer_chain
 from langchain_openai import AzureChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
-load_dotenv()
+load_env_vars()
 
-api_key = os.getenv("AZURE_OPENAI_API_KEY")
-endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-api_version = os.getenv("AZURE_OPENAI_API_VERSION") 
+deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
+
 
 llm = AzureChatOpenAI(
-    openai_api_key=api_key,
-    azure_endpoint=endpoint,
     deployment_name=deployment,
-    openai_api_version=api_version,
     temperature=0
 )
-
-prompt_template = PromptTemplate.from_template(
-    "Summarize the following text into exactly 3 sentences:\n\n{text}"
-)
-
-
-chain = prompt_template | llm 
 
 test_paragraph = """
 Artificial intelligence (AI) refers to the simulation of human intelligence processes by machines, 
@@ -43,8 +32,7 @@ balance between harnessing its potential and addressing its challenges. This dua
 one of the most transformative and debated technologies of our time.
 """
 
-print("\n--- 3 Sentence Summary ---")
-print(chain.invoke({"text":test_paragraph}).content)
+summarizer_chain(test_paragraph)
 
 prompt_template_one = PromptTemplate.from_template(
     "Summarize the following text into exactly 1 sentence:\n\n{text}"
